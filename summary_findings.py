@@ -44,6 +44,7 @@ def process_arguments():
 class SummaryFindings(object):
     def __init__(self):
         self.html = None
+        self.soup = None
 
     def download_sum_findings(self, ir_id, ir_ver):
         """
@@ -68,28 +69,27 @@ class SummaryFindings(object):
         else:
             sys.exit(f'number of interpretation requests {len(ir_details)}')
 
-    def expand_coverage(self, soup):
+    def expand_coverage(self):
         '''Expand the coverage section'''
         # find the coverage div and delete so coverage seciton no longer needs to be clicked to be visible
-        for section in soup.find_all('div', id = "coverage"):
+        for section in self.soup.find_all('div', id = "coverage"):
             del(section['hidden'])
         # find the section header and remove text/hyperlink properties
-        for section in soup.find_all('a'):
+        for section in self.soup.find_all('a'):
             # find the coverage section
             if "Coverage Metrics" in section.get_text():
                 # remove the extra styles no longer needed
                 del(section['onclick'])
                 del(section['style'])
         # remove the 'Click to collapse/expand' text
-        for section in soup.find_all('small'):
+        for section in self.soup.find_all('small'):
             if "Click to collapse/expand" in section.get_text():
                 section.decompose()
-        return soup
 
-    def stop_annex_tables_splitting_over_page(self, soup):
+    def stop_annex_tables_splitting_over_page(self):
         '''This script takes the referenced databases and software version tables and stops these being broken over pages'''
         # find all tables
-        for table in soup.find_all('table'):
+        for table in self.soup.find_all('table'):
             #find the table head
             for head in table.find_all('thead'):
                 # find each column in the header
@@ -98,46 +98,40 @@ class SummaryFindings(object):
                     if col.get_text() == "Name":
                         # prevent page breaks
                         table['style'] = " page-break-inside: avoid !important"
-        #return new soup        
-        return soup
 
-    def fix_logo(self, soup):
+    def fix_logo(self):
         # find the img tag where class == logo (should only be one)
-        for img in soup.find_all('img', {'class':"logo"}):
+        for img in self.soup.find_all('img', {'class':"logo"}):
             # Need to ensure the image doesn't shrink
             img['style'] = "height:85px;"
-        # return the modified soup
-        return soup
 
-    def stop_overheader_line_split(self, soup):
+    def stop_overheader_line_split(self):
         # Find div containing top header with participant ID and generated on date
-        for div in soup.find_all('div', {'class':"over-header content-div"}):
+        for div in self.soup.find_all('div', {'class':"over-header content-div"}):
             # prevent 'Generated on: ...' text wrapping over two lines
             div['style'] = "white-space:nowrap;"
-        return soup
 
-    def remove_dropshadow(self, soup):
+    def remove_dropshadow(self):
         # Find report div
-        for div in soup.find_all('div', id = "report"):
+        for div in self.soup.find_all('div', id = "report"):
             # prevent 'Generated on: ...' text wrapping over two lines
             div['style'] = "box-shadow:none;"
-        return soup    
-
+ 
     def fix_formatting(self):
         # Read html into a beautiful soup object
-        soup = BeautifulSoup(self.html, "html.parser")
+        self.soup = BeautifulSoup(self.html, "html.parser")
         # Coverage section is collapsed by default, we want it expanded
-        soup = self.expand_coverage(soup)
+        self.expand_coverage()
         # Information can be lost when a table cell is split over pages, so fix this
-        soup = self.stop_annex_tables_splitting_over_page(soup)
+        self.stop_annex_tables_splitting_over_page()
         # Logo and banner shrink, so need to fix this
-        soup = self.fix_logo(soup)
+        self.fix_logo()
         # Top line with 'Generated on:...' date splits over two lines, stop this happening
-        soup = self.stop_overheader_line_split(soup)
+        self.stop_overheader_line_split()
         # Get rid of the dropshadow border
-        soup = self.remove_dropshadow(soup)
+        self.remove_dropshadow()
         # Turn back into a string    
-        self.html = str(soup)
+        self.html = str(self.soup)
 
     def write_pdf(self, pdfreport_path, wkhtmltopdf):
         '''
