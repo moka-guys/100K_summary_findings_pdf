@@ -21,6 +21,7 @@ optional arguments:
                         Output PDF
 """
 
+import sys
 import argparse
 from bs4 import BeautifulSoup
 import pdfkit
@@ -42,7 +43,6 @@ def process_arguments():
 
 class SummaryFindings(object):
     def __init__(self):
-        self.error = None
         self.html = None
 
     def download_sum_findings(self, ir_id, ir_ver):
@@ -62,11 +62,11 @@ class SummaryFindings(object):
                     # Store the returned html for use by other methods
                     self.html = response.text
                 else: 
-                    self.error = f'response code {response.status_code}'
+                    sys.exit(f'response code {response.status_code}')
             else:
-                self.error = f'number of clinical reports {len(ir_details[0]["clinical_reports"])}'
+                sys.exit(f'number of clinical reports {len(ir_details[0]["clinical_reports"])}')
         else:
-            self.error = f'number of interpretation requests {len(ir_details)}'
+            sys.exit(f'number of interpretation requests {len(ir_details)}')
 
     def expand_coverage(self, soup):
         '''Expand the coverage section'''
@@ -160,14 +160,9 @@ def main():
     # Download summary of findings
     sof = SummaryFindings()
     sof.download_sum_findings(ir_id=args.ir_id, ir_ver=args.ir_version)
-    # If no error...
-    if not sof.error:
-        # Write out to a pdf
-        sof.fix_formatting()
-        sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
-    # If there was an error, print the error message
-    else:
-        print(sof.error)
+    # Write out to a pdf
+    sof.fix_formatting()
+    sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
 
 if __name__ == '__main__':
     main()
