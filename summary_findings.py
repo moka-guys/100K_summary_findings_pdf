@@ -86,6 +86,17 @@ class SummaryFindings(object):
             if "Click to collapse/expand" in section.get_text():
                 section.decompose()
 
+    def check_for_errors(self):
+        '''issue warning (or abort) if any errors are found when reporting eg can't find coverage report etc. Uses a warning message from config file'''
+        # look for presence of an warning message
+        for div in self.soup.find_all('div', {'class':'content-div error-panel'}):
+            # if there is an error
+            if div:
+                # capture and print the error message
+                for message in div.find_all('p'):
+                    print(f"Error message found in report: {message.get_text()}")
+                sys.exit("Error messages found in report. Exiting")
+
     def stop_annex_tables_splitting_over_page(self):
         '''This script takes the referenced databases and software version tables and stops these being broken over pages'''
         # find all tables
@@ -120,6 +131,8 @@ class SummaryFindings(object):
     def fix_formatting(self):
         # Read html into a beautiful soup object
         self.soup = BeautifulSoup(self.html, "html.parser")
+        # Check for any error messages in html (e.g. couldn't retrieve coverage information)
+        self.check_for_errors()
         # Coverage section is collapsed by default, we want it expanded
         self.expand_coverage()
         # Information can be lost when a table cell is split over pages, so fix this
