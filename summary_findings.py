@@ -25,6 +25,8 @@ import sys
 import argparse
 from bs4 import BeautifulSoup
 import pdfkit
+# Append JellyPy to python path, needed when running via paramiko from Windows
+sys.path.append('/home/mokaguys/Apps/JellyPy')
 from pyCIPAPI.auth import AuthenticatedCIPAPISession
 from pyCIPAPI.interpretation_requests import get_interpretation_request_list
 
