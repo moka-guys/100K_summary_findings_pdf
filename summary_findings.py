@@ -40,6 +40,7 @@ def process_arguments():
     parser.add_argument('--ir_id', required=True, help='Interpretation request ID')
     parser.add_argument('--ir_version', required=True, help='Interpretation request version')
     parser.add_argument('-o', '--output_file', required=True, help='Output PDF')
+    parser.add_argument('--header', required=False, help='Text for header of report')
     # Return the arguments
     return parser.parse_args()
 
@@ -148,7 +149,7 @@ class SummaryFindings(object):
         # Turn back into a string    
         self.html = str(self.soup)
 
-    def write_pdf(self, pdfreport_path, wkhtmltopdf):
+    def write_pdf(self, pdfreport_path, wkhtmltopdf, header):
         '''
         Given the name of a html file, look in the folder containing these files (specified in config) and convert to a pdf, saving at the specified location.
         Uses pdfkit and wkthmltopdf
@@ -160,6 +161,10 @@ class SummaryFindings(object):
         options = {
             'quiet': ''
             }
+        if header:
+            options['header-left'] = header
+            options['header-font-size'] = 8
+            options['header-spacing'] = 2
         # create the pdf using template.render to populate variables from dictionary created in read_geneworks
         pdfkit.from_string(self.html, pdfreport_path, options=options, configuration=pdfkitconfig)
 
@@ -171,7 +176,7 @@ def main():
     sof.download_sum_findings(ir_id=args.ir_id, ir_ver=args.ir_version)
     # Write out to a pdf
     sof.fix_formatting()
-    sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf='/usr/local/bin/wkhtmltopdf')
+    sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf='/usr/local/bin/wkhtmltopdf', header=args.header)
 
 if __name__ == '__main__':
     main()
