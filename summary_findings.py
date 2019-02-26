@@ -6,10 +6,10 @@ Requirements:
     wkhtmlpdfkit
     pdfkit
     Access to CIPAPI
-    JellyPy (in PYTHONPATH)
+    JellyPy
 
-usage: download_summary_findings.py [-h] --ir_id IR_ID --ir_version IR_VERSION
-                                    -o OUTPUT_FILE
+usage: summary_findings.py [-h] --ir_id IR_ID --ir_version IR_VERSION -o
+                           OUTPUT_FILE [--header HEADER]
 
 Downloads summary of findings for given interpretation request
 
@@ -20,6 +20,7 @@ optional arguments:
                         Interpretation request version
   -o OUTPUT_FILE, --output_file OUTPUT_FILE
                         Output PDF
+  --header HEADER       Text for header of report
 """
 
 import sys

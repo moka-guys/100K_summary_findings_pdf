@@ -6,8 +6,9 @@ Requirements:
 * Python 3.6
 * BeautifulSoup
 * pdfkit
+* wkhtmlpdfkit
 * Access to CIPAPI
-* JellyPy (in PYTHONPATH)
+* JellyPy
 
 On `SV-TE-GENAPP01` activate the `jellypy_py3` conda environment so that above requirements are met:
 
@@ -15,11 +16,13 @@ On `SV-TE-GENAPP01` activate the `jellypy_py3` conda environment so that above r
 source activate jellypy_py3
 ```
 
-Then run the script, supplying the interpretation request ID, version and output file path for the PDF.
+Rename `example_summary_findings_config.py` to `summary_findings_config.py` and update config as required.
+
+Then run the script, supplying the interpretation request ID, version, output file path and (optional) header for the PDF.
 
 ```
-usage: download_summary_findings.py [-h] --ir_id IR_ID --ir_version IR_VERSION
-                                    -o OUTPUT_FILE
+usage: summary_findings.py [-h] --ir_id IR_ID --ir_version IR_VERSION -o
+                           OUTPUT_FILE [--header HEADER]
 
 Downloads summary of findings for given interpretation request
 
@@ -30,4 +33,6 @@ optional arguments:
                         Interpretation request version
   -o OUTPUT_FILE, --output_file OUTPUT_FILE
                         Output PDF
+  --header HEADER       Text for header of report
+
 ```
