@@ -26,8 +26,9 @@ import sys
 import argparse
 from bs4 import BeautifulSoup
 import pdfkit
+import summary_findings_config as config
 # Append JellyPy to python path, needed when running via paramiko from Windows
-sys.path.append('/home/mokaguys/Apps/JellyPy')
+sys.path.append(config.jellypy_path)
 from pyCIPAPI.auth import AuthenticatedCIPAPISession
 from pyCIPAPI.interpretation_requests import get_interpretation_request_list
 
@@ -177,7 +178,7 @@ def main():
     sof.download_sum_findings(ir_id=args.ir_id, ir_ver=args.ir_version)
     # Write out to a pdf
     sof.fix_formatting()
-    sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf='/usr/local/bin/wkhtmltopdf', header=args.header)
+    sof.write_pdf(pdfreport_path=args.output_file, wkhtmltopdf=config.wkhtmltopdf_path, header=args.header)
 
 if __name__ == '__main__':
     main()
