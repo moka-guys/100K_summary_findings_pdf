@@ -3,6 +3,7 @@ v1.0 - AB 2019/02/18
 Requirements:
     Python 3.6
     BeautifulSoup
+    wkhtmlpdfkit
     pdfkit
     Access to CIPAPI
     JellyPy (in PYTHONPATH)
@@ -66,15 +67,15 @@ class SummaryFindings(object):
                     # Store the returned html for use by other methods
                     self.html = response.text
                 else: 
-                    sys.exit(f'response code {response.status_code}')
+                    sys.exit(f'ERROR: Unable to download summary of findings. Response code {response.status_code}')
             else:
-                sys.exit(f'number of clinical reports {len(ir_details[0]["clinical_reports"])}')
+                sys.exit(f'ERROR: Number of clinical reports found {len(ir_details[0]["clinical_reports"])}')
         else:
-            sys.exit(f'number of interpretation requests {len(ir_details)}')
+            sys.exit(f'ERROR: Number of interpretation requests found {len(ir_details)}')
 
     def expand_coverage(self):
         '''Expand the coverage section'''
-        # find the coverage div and delete so coverage seciton no longer needs to be clicked to be visible
+        # find the coverage div and delete so coverage section no longer needs to be clicked to be visible
         for section in self.soup.find_all('div', id = "coverage"):
             del(section['hidden'])
         # find the section header and remove text/hyperlink properties
@@ -98,7 +99,7 @@ class SummaryFindings(object):
                 # capture and print the error message
                 for message in div.find_all('p'):
                     print(f"Error message found in report: {message.get_text()}")
-                sys.exit("Error messages found in report. Exiting")
+                sys.exit("ERROR: Error messages found in report. Exiting")
 
     def stop_annex_tables_splitting_over_page(self):
         '''This script takes the referenced databases and software version tables and stops these being broken over pages'''
